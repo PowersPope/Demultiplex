@@ -16,7 +16,9 @@
     !['R2 Graph'](./distribution/1294_S1_L008_R2_001.fastq.gz-stats.png)
     !['R3 Graph'](./distribution/1294_S1_L008_R3_001.fastq.gz-stats.png)
     !['R4 Graph'](./distribution/1294_S1_L008_R4_001.fastq.gz-stats.png)
-    2. ```30 seems like a good cutoff, as all of the means are above 30 and this retains a good qscore so we know that the read is legible.```
+
+    2. ```20 qScores are a favorable cutoff for our purposes. As long as the whole read has a 20 qScore overall, then it will be of high quality enough to proceed forward with. A qScore of 20 will have a 1 in 100 chance of having an incorrect read associated with it. Which is good for the enitre read, since the there are 101 bps within the read as a whole. If only 1 nucleotide is wrong, that will be corrected for by the other reads which should have the correct nucleotide.```
+    
     3. 
     ```
     zcat 1294_S1_L008_R[2,3]_001.fastq.gz |sed -n '2~4p' | awk '$0 ~ /N/ {sum+=1} END{print sum}' 
