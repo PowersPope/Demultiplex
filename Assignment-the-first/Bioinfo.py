@@ -3,7 +3,7 @@ def add_indexes_to_reads(file1: str, file2: str, file3: str, file4: str) -> str:
     """Open all of the files and iter through each of them line by line. Adding the indexes
     from R2 and R3 to the header of File1 and File4 lines."""
 
-    return "None"
+    return read1_with_indexes, read2_with_indexes
 
 def bucket_addition(header1: str, header2: str) -> str:
     """Take the header for each read after the addition from add_indexes_to_reads and check
@@ -11,7 +11,7 @@ def bucket_addition(header1: str, header2: str) -> str:
     If it passes the correct parameters then put the indexes into its corresponding buckets and readfile orientation.
     Example R1/R4"""
 
-    return "None"
+    return addition_of_records_to_correct_bucket
 
 def correct_error_singlebase_call(sequence1: str, sequence2: str) -> str:
     """Test to see if there is an N in the either sequence. If so then at the position of the N in the string,
@@ -20,7 +20,7 @@ def correct_error_singlebase_call(sequence1: str, sequence2: str) -> str:
 
     rev_dict = {'A':'T', 'T':'A', 'G':'C', 'C':'G'}
 
-    return "None"
+    return string_of_index_with_correct_sequence_nomore_N
 
 
 
