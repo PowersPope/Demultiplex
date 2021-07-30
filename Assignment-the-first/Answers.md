@@ -38,8 +38,13 @@ We have to put these reads into their index associated bins. There will be a for
 
 4. Pseudocode
 
+Look at pseudocode.py which is included in the same github repo.
+
 5. High level functions. For each function, be sure to include:
     1. Description/doc string
     2. Function headers (name and parameters)
     3. Test examples for individual functions
     4. Return statement
+
+
+Look at the Bioinfo.py to check high level functions
