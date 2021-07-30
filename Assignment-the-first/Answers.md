@@ -17,7 +17,9 @@
     !['R3 Graph'](./distribution/1294_S1_L008_R3_001.fastq.gz-stats.png)
     !['R4 Graph'](./distribution/1294_S1_L008_R4_001.fastq.gz-stats.png)
 
-    2. ```20 qScores are a favorable cutoff for our purposes. As long as the whole read has a 20 qScore overall, then it will be of high quality enough to proceed forward with. A qScore of 20 will have a 1 in 100 chance of having an incorrect read associated with it. Which is good for the enitre read, since the there are 101 bps within the read as a whole. If only 1 nucleotide is wrong, that will be corrected for by the other reads which should have the correct nucleotide.```
+    2. ```20 qScores are a favorable cutoff for our purposes for reads. As long as the whole read has a 20 qScore overall, then it will be of high quality enough to proceed forward with. A qScore of 20 will have a 1 in 100 chance of having an incorrect read associated with it. Which is good for the enitre read, since the there are 101 bps within the read as a whole. If only 1 nucleotide is wrong, that will be corrected for by the other reads which should have the correct nucleotide.
+    
+    However for the Indexes since there are only 8 nucleotides and they cannot be wrong a cutoff score of 30 is what I will use.```
     
     3. 
     ```
