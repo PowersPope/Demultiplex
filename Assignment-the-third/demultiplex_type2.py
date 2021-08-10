@@ -136,31 +136,43 @@ with gzip.open(args.file1, 'rt') as read1, gzip.open(args.file2, 'rt') as index1
                     # mean1 = np.array(qual_read1).mean()
                     # mean2 = np.array(qual_read2).mean()
 
-
+                    # Check to see if the mean qScore is over 30 (I could add a modular part to this instead of it being hardcoded)
                     if mean_i1 >= 30 or mean_i2 >= 30:
+
+                        ####### Add to the appropriate index dual pair file
                         for line_f1 in holding_dict['read1']:
                             file_index_dict[holding_dict['index1'][1]].write(line_f1 + '\n')
                         for line_f2 in holding_dict['read2']:
                             file_index_dict[holding_dict['index2'][1]].write(line_f2 + '\n')
+                        # Increment the dual index specific count
                         new_bin_dict[index_addition] += 1
                     else:
+
+                        ###### Add to the bad files if they fail the mean qScore check
                         for line_f1 in holding_dict['read1']:
                             file_index_dict['bad1'].write(line_f1+'\n')
                         for line_f2 in holding_dict['read2']:
                             file_index_dict['bad2'].write(line_f2+'\n')
+                        # Increment the bad specific counter
                         new_bin_dict['bad'] += 1
                 else:
+
+                    ##### Add to index hopping files if they don't pass the reverse comp/dual index test
                     for line_f1 in holding_dict['read1']:
                         file_index_dict['index_hopping1'].write(line_f1+'\n')
                     for line_f2 in holding_dict['read2']:
                         file_index_dict['index_hopping2'].write(line_f2+'\n')
+                    # Increment the index_hopping total and the specific index hopped pair total
                     new_bin_dict['index_hopping'] += 1
                     new_bin_dict[index_addition] += 1
             else:
+
+                ##### Add to bad files if they have Ns in index
                 for line_f1 in holding_dict['read1']:
                     file_index_dict['bad1'].write(line_f1+'\n')
                 for line_f2 in holding_dict['read2']:
                     file_index_dict['bad2'].write(line_f2+'\n')
+                # Increment bad file count
                 new_bin_dict['bad'] += 1
 
             #Now that all of the processing is done. This will make the dictionary values blank again. So we can restart the process.
