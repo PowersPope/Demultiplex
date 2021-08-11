@@ -25,63 +25,39 @@ args = get_args()
 holding_dict = {'read1': [], 'index1': [], 'index2': [], 'read2': []}
 
 
-# Create dict outputs with handel and outputs
+# Create dict with indexes as keys and a tuple with (handle, open(outputfile, 'w')) as values
 file_index_dict ={} #Empty dict to be filled
-index_set = set()
+index_set = set() # Create an empty set that will hold the unique indexes
 with open(args.indexes, 'r') as index_file:
-    header = index_file.readline()
+    header = index_file.readline() #Get rid of the header line so that columns are in the dictionary
     for line in index_file:
+        # Pull out the handle (Ex. B1, A11)
         index_handle = (line.strip()).split('\t')[3]
+        # Pull out the index 
         index_string = (line.strip()).split('\t')[4]
+        # This is to cehck and see if the directory exists already. If not, then create it. If not then do nothing.
         file_string = 'index{}/'.format(index_handle)
         os.makedirs(file_string, exist_ok=True)
+
+        # Create the key value pair described at the top of this. The first one is the forward index, the second one is the reverse comp of it
         file_index_dict[index_string] = (index_handle, open(file_string + 'read1.fastq', 'w'))
         file_index_dict[Bioinfo.reverse_compliment(index_string)] = (index_handle, open(file_string + 'read2.fastq', 'w'))
+        
+        # Add all of the unique indexes to a set
         index_set.add((line.strip()).split('\t')[4])
 
 
-
-
-
-# Create a list of the indexes with their reverse compliment next to them.
-# list_of_indexes = []
-# index_set = set()
-# # count_bin_dict = {} # A dictionary to store counts 
-# with open(args.indexes, 'r') as full_indexes:
-#     for line in full_indexes:
-#         # list_of_indexes.append(line.strip())
-#         # list_of_indexes.append(Bioinfo.reverse_compliment(line.strip()))
-#         index_set.add((line.strip()).split('\t')[4])
-
-# All possible pair dictionary
-new_bin_dict = {}
-access_index = list(index_set)
+# All possible index pairs (dual and swapped) dictionary that holds the counts for them.
+new_bin_dict = {} # New empty dict for the counts
+access_index = list(index_set) # Make an iterable list of the set
 storage_index = set() # Set to keep the combined dual indexes together
-count = 0
-for foo in range(0, len(index_set)):
-    count += 1
-    for red_foo in range(0, len(index_set)):
-        combine_index = access_index[foo] + "-" + Bioinfo.reverse_compliment(access_index[red_foo])
-        new_bin_dict[combine_index] = 0
-        if access_index[foo] == access_index[red_foo]:
-            storage_index.add(combine_index)
-
-
-
-# # Create a dictionary with file paths for the indexes
-# file_index_dict ={} #Empty dict to be filled
-# index_range = list(range(1, len(list_of_indexes)+1)) # list of n numbers of indexes
-# file_range = [1,2] * int(len(list_of_indexes)/2) # list of 1,2 * n/2 so that we get read1, and read2 designations
-# count = 0 
-# for handle, new_index in list_of_indexes:
-#     count += 1 # increment count
-#     file_string = "index{}/read{}.fastq".format(index_range[0], file_range[0])
-#     os.makedirs(os.path.dirname(file_string), exist_ok=True)
-#     file_index_dict[new_index] =  (handle ,open(file_string, 'w')) # create the dictionary entry
-#     file_range.pop(0) #remove the file_range first item after every addition 
-#     if count % 2 == 0: # if the count is divisible by 2 then remove the first item from the index range list
-#         index_range.pop(0)
-
+# Create all possible pairs 24 * 24 (576)
+for foo in range(0, len(index_set)): # First variable in the pair
+    for red_foo in range(0, len(index_set)): # Second variable in the pair
+        combine_index = access_index[foo] + "-" + Bioinfo.reverse_compliment(access_index[red_foo]) # Combine them together
+        new_bin_dict[combine_index] = 0 # Add to dict with a 0 value
+        if access_index[foo] == access_index[red_foo]: # Create a set of all the unique dual indexes
+            storage_index.add(combine_index) # Add to a set if it is completely unique dual index (This is for later stats)
 
 # Add in the bad and index_hopping file paths
 os.makedirs('bad', exist_ok=True)
@@ -96,7 +72,7 @@ file_index_dict['index_hopping2'] = ('index_hopping', open("index_hopping/read2.
 new_bin_dict['bad'] = 0
 new_bin_dict['index_hopping'] = 0
 
-#######################  Sort records into their buckets/files ##############################################################################
+#######################  Sort records into their buckets/files loop ##############################################################################
 
 # Open all of the command line passed files.
 with gzip.open(args.file1, 'rt') as read1, gzip.open(args.file2, 'rt') as index1, gzip.open(args.file3, 'rt') as index2, gzip.open(args.file4, 'rt') as read2:
@@ -135,29 +111,13 @@ with gzip.open(args.file1, 'rt') as read1, gzip.open(args.file2, 'rt') as index1
                 if file_index_dict[holding_dict['index1'][1]][0] == file_index_dict[holding_dict['index2'][1]][0]:
                     
 
-                    #Check the mean Quality score of the indexes
+                    # Convert quality scores to qScore then take the mean and run check variables
                     qual_index1 = np.mean([Bioinfo.convert_phred(num) for num in holding_dict['index1'][3]])
                     qual_index2 = np.mean([Bioinfo.convert_phred(num) for num in holding_dict['index2'][3]])
-
+                    # Check against cutoff
                     mean1_test = qual_index1 >= int(args.cutoff)
                     mean2_test = qual_index2 >= int(args.cutoff)
-                    
-                    # for num in holding_dict['index1'][3]:
-                    #     qual_index1.append(Bioinfo.convert_phred(num))
-                    # for num in holding_dict['read2'][3]:
-                    #     qual_index2.append(Bioinfo.convert_phred(num))
-                    # for num in holding_dict['read1'][3]:
-                    #     qual_read1.append(Bioinfo.convert_phred(num))
-                    # for num in holding_dict['index2'][3]:
-                    #     qual_read2.append(Bioinfo.convert_phred(num))
-                    
 
-
-                    # Calculate the mean for the indexes
-                    # mean_i1 = np.mean(qual_index1)
-                    # mean_i2 = np.mean(qual_index2)
-                    # mean1 = np.array(qual_read1).mean()
-                    # mean2 = np.array(qual_read2).mean()
 
                     # Check to see if the mean qScore is over 30 (I could add a modular part to this instead of it being hardcoded)
                     if mean1_test or mean2_test:
@@ -198,7 +158,8 @@ with gzip.open(args.file1, 'rt') as read1, gzip.open(args.file2, 'rt') as index1
                 # Increment bad file count
                 new_bin_dict['bad'] += 1
 
-            #Now that all of the processing is done. This will make the dictionary values blank again. So we can restart the process.
+            # Now that all of the processing is done. This will make the dictionary values blank again. So we can restart the process. 
+            # Much better computationally to .clear() then to just make a new list. The old list would have stayed in livrary and slowed everything down.
             holding_dict['read1'].clear()
             holding_dict['index1'].clear()
             holding_dict['read2'].clear()
@@ -232,8 +193,5 @@ with open('total_stats.txt', 'w') as stats:
         stats.write(key + "\t" + str(new_bin_dict[key]) + "\t" + str(round(new_bin_dict[key]/count * 100, 2)) + '%\n')
     stats.write('Total Dual Indexes\t' + str(total_index) + '\t' + str(round(total_index/count * 100,2)) + '%\n' )
     
-
-
-
-
+# Yay! We Finished!
 print("All closed!")
