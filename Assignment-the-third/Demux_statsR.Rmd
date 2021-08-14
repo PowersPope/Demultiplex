@@ -1,0 +1,29 @@
+---
+title: "Demux"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+
+```{r}
+dual_indexes = read.table('dual_index.txt')
+handles = read.table('handles.txt')
+dual_indexes$V3 = gsub("%", "", as.character(dual_indexes$V3))
+final_df = dual_indexes %>% mutate(`V3` = as.double(`V3`))
+new_final = cbind.data.frame(final_df, handles) 
+colnames(new_final) = c('Indexes', 'Count', 'Percent', 'Handles')
+new_final$Handles = factor(new_final$Handles, levels=unique(new_final$Handles))
+
+plot(new_final %>% ggplot() +
+  geom_bar(aes(x=`Handles`, y=`Percent`, color=`Handles`, fill=`Handles`), stat = 'identity') +
+  labs(x='Dual Index Pairs', y='Percentages of total', title='Dual Indexes Present in Illumina Run Percentage') +
+  theme(plot.title = element_text(hjust=0.5), legend.position = 'none')
+    )
+
+```
+
